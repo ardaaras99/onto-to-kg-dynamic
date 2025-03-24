@@ -3,17 +3,28 @@ name = "onto-to-kg-dynamic"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-authors = [
-    { name = "Arda Can Aras", email = "ardaaras99@gmail.com" }
-]
-requires-python = ">=3.13.2"
+authors = [{ name = "Arda Can Aras", email = "ardaaras99@gmail.com" }]
+requires-python = "==3.13.2"
 dependencies = [
-    "pydantic>=2.10.6",
+    "langchain>=0.3.21",
+    "langchain-community>=0.3.20",
+    "langchain-core>=0.3.45",
+    "langchain-openai>=0.3.9",
+    "pydantic>=2.6.1",
+    "pypdf2>=3.0.1",
+    "pytest>=8.3.5",
+    "unstructured[pdf]>=0.17.2",
 ]
 
 [project.scripts]
 onto-to-kg-dynamic = "onto_to_kg_dynamic:main"
 
+[tool.ruff]
+line-length = 200
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = ["commitizen>=4.4.1"]
