@@ -1,0 +1,19 @@
+[project]
+name = "onto-to-kg-dynamic"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Arda Can Aras", email = "ardaaras99@gmail.com" }
+]
+requires-python = ">=3.13.2"
+dependencies = [
+    "pydantic>=2.10.6",
+]
+
+[project.scripts]
+onto-to-kg-dynamic = "onto_to_kg_dynamic:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
