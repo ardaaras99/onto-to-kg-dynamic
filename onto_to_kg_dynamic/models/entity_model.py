@@ -1,12 +1,12 @@
 from langchain.output_parsers import PydanticOutputParser
 from langchain.prompts import PromptTemplate
 from langchain.schema import Document
+from langchain_community.document_loaders import UnstructuredPDFLoader
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
 
 from onto_to_kg_dynamic.base_ontology import BaseNode
 from onto_to_kg_dynamic.models.configurations import EntityExtractorConfig
-from onto_to_kg_dynamic.pdf_loader import PDFLoader
 
 
 class EntityExtractor:
@@ -19,13 +19,13 @@ class EntityExtractor:
 
     def pipeline(self) -> list[BaseNode]:
         document = self._load_pdf()
-        result = self.chain.invoke({"input_text": document.page_content})
-        entity_ontology_instance = self.parser.parse(result.content)
+        content = str(self.chain.invoke({"input_text": document.page_content}).content)
+        entity_ontology_instance = self.parser.parse(content)
         # define the type of the instance
         return self._extract_nodes_from_instance(entity_ontology_instance)
 
-    def _extract_nodes_from_instance(self, instance: type[BaseModel]) -> list[BaseNode]:
-        found_nodes_list = []
+    def _extract_nodes_from_instance(self, instance: BaseModel) -> list[BaseNode]:
+        found_nodes_list: list[BaseNode] = []
         for key in instance.__dict__.keys():
             if key.endswith("_node"):
                 found_nodes_list.append(getattr(instance, key))
@@ -36,8 +36,8 @@ class EntityExtractor:
     def _load_pdf(self) -> Document:
         ##! Currently list[Document] is not supported
         """Load the PDF file specified in the config."""
-        pdf_loader = PDFLoader(loader_type=self.config.pdf_loader_type, **self.config.pdf_loader_kwargs)
-        document = pdf_loader.load(self.config.file_path)[0]
+        pdf_loader = UnstructuredPDFLoader(self.config.file_path, mode="single")
+        document = pdf_loader.load()[0]
         return document
 
     def _create_prompt(self) -> PromptTemplate:

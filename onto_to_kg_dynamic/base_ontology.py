@@ -1,3 +1,5 @@
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 
@@ -23,5 +25,5 @@ class BaseRelation(BaseModel):
         attributes (dict): The attributes of the relation.
     """
 
-    reason: str = Field(default=None, description="Bu ilişkiyi çıkarmana karar vermene sahip olan neden")
-    attributes: dict = Field(default_factory=dict, description="İlişkinin özellikleri")
+    reason: str | None = Field(default=None, description="Bu ilişkiyi çıkarmana karar vermene sahip olan neden")
+    attributes: dict[str, Any] = Field(default_factory=lambda: {}, description="İlişkinin özellikleri")

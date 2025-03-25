@@ -7,7 +7,6 @@ from pydantic import BaseModel, Field, create_model
 from onto_to_kg_dynamic.base_ontology import BaseNode
 from onto_to_kg_dynamic.models.configurations import EntityExtractorConfig, LLMOptions
 from onto_to_kg_dynamic.models.entity_model import EntityExtractor
-from onto_to_kg_dynamic.pdf_loader import PDFLoaderType
 from onto_to_kg_dynamic.utils import node_list_to_ontology
 
 
@@ -44,7 +43,7 @@ def kira_süresi_node() -> type[BaseNode]:
 
 
 @pytest.fixture
-def entity_ontology(sözleşme_node: type[BaseNode], kira_süresi_node: type[BaseNode]):
+def entity_ontology(sözleşme_node: type[BaseNode], kira_süresi_node: type[BaseNode]) -> type[BaseModel]:
     node_list = [
         (sözleşme_node, False, "Sözleşmenin kendisine ait olan Node"),
         (kira_süresi_node, False, "Kira Süresi ile alakalı her şeyi tutan Node"),
@@ -53,33 +52,19 @@ def entity_ontology(sözleşme_node: type[BaseNode], kira_süresi_node: type[Bas
 
 
 @pytest.fixture
-def entity_extractor_config(sample_pdf_path: Path, entity_ontology: type[BaseModel]):
+def entity_extractor_config(sample_pdf_path: Path, entity_ontology: type[BaseModel]) -> EntityExtractorConfig:
     return EntityExtractorConfig(
         file_path=sample_pdf_path,
         ontology=entity_ontology,
         llm_model_name=LLMOptions.OPENAI_O3_MINI,
-        pdf_loader_type=PDFLoaderType.UNSTRUCTURED,
         pdf_loader_kwargs={"mode": "single"},
     )
 
 
 @pytest.mark.parametrize("llm_model", [LLMOptions.OPENAI_O3_MINI, LLMOptions.OPENAI_GPT4_O1])
-def test_entity_extractor_with_different_llms(entity_extractor_config: EntityExtractorConfig, llm_model: LLMOptions):
+def test_entity_extractor_with_different_llms(entity_extractor_config: EntityExtractorConfig, llm_model: LLMOptions) -> None:
     """Test EntityExtractor with different LLM models"""
     entity_extractor_config.llm_model_name = llm_model
-    entity_extractor = EntityExtractor(entity_extractor_config)
-    result = entity_extractor.pipeline()
-
-    # Verify the result structure
-    assert isinstance(result, list)
-    assert all(isinstance(node, BaseNode) for node in result)
-
-
-## No need to test since we already have test_pdf_loader
-@pytest.mark.parametrize("pdf_loader_type", [PDFLoaderType.UNSTRUCTURED, PDFLoaderType.PYPDF])
-def test_entity_extractor_with_different_pdf_loaders(entity_extractor_config: EntityExtractorConfig, pdf_loader_type: PDFLoaderType):
-    """Test EntityExtractor with different PDF loader types"""
-    entity_extractor_config.pdf_loader_type = pdf_loader_type
     entity_extractor = EntityExtractor(entity_extractor_config)
     result = entity_extractor.pipeline()
 
