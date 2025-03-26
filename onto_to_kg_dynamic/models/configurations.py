@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any
 
+from base_ontology.node import BaseNode
 from pydantic import BaseModel
 
 
@@ -16,4 +16,11 @@ class EntityExtractorConfig:
     file_path: Path
     ontology: type[BaseModel]
     llm_model_name: LLMOptions
-    pdf_loader_kwargs: dict[str, Any]
+
+
+@dataclass
+class KGExtractorConfig:
+    use_found_nodes: bool  #! This will be replaced in production
+    node_dict: dict[str, tuple[type[BaseNode], bool, str]]
+    relation_dict: dict[str, type[BaseNode]]
+    entity_extractor_config: EntityExtractorConfig

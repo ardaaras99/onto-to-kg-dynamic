@@ -1,3 +1,4 @@
+from base_ontology.node import BaseNode
 from langchain.output_parsers import PydanticOutputParser
 from langchain.prompts import PromptTemplate
 from langchain.schema import Document
@@ -5,7 +6,6 @@ from langchain_community.document_loaders import UnstructuredPDFLoader
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
 
-from onto_to_kg_dynamic.base_ontology import BaseNode
 from onto_to_kg_dynamic.models.configurations import EntityExtractorConfig
 
 
@@ -24,7 +24,8 @@ class EntityExtractor:
         # define the type of the instance
         return self._extract_nodes_from_instance(entity_ontology_instance)
 
-    def _extract_nodes_from_instance(self, instance: BaseModel) -> list[BaseNode]:
+    @staticmethod
+    def _extract_nodes_from_instance(instance: BaseModel) -> list[BaseNode]:
         found_nodes_list: list[BaseNode] = []
         for key in instance.__dict__.keys():
             if key.endswith("_node"):

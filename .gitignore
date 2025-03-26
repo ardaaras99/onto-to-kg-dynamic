@@ -174,3 +174,5 @@ cython_debug/
 .pypirc
 .vscode/
 exp.py
+**example_ontology/
+kg_visualization.html

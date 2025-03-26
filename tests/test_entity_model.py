@@ -2,12 +2,12 @@ from datetime import datetime
 from pathlib import Path
 
 import pytest
+from base_ontology.node import BaseNode
 from pydantic import BaseModel, Field, create_model
 
-from onto_to_kg_dynamic.base_ontology import BaseNode
 from onto_to_kg_dynamic.models.configurations import EntityExtractorConfig, LLMOptions
 from onto_to_kg_dynamic.models.entity_model import EntityExtractor
-from onto_to_kg_dynamic.utils import node_list_to_ontology
+from onto_to_kg_dynamic.utils import node_dict_to_ontology
 
 
 @pytest.fixture
@@ -48,7 +48,9 @@ def entity_ontology(sözleşme_node: type[BaseNode], kira_süresi_node: type[Bas
         (sözleşme_node, False, "Sözleşmenin kendisine ait olan Node"),
         (kira_süresi_node, False, "Kira Süresi ile alakalı her şeyi tutan Node"),
     ]
-    return node_list_to_ontology(node_list)
+    node_dict = {node.__name__: (node, is_relation, description) for node, is_relation, description in node_list}
+
+    return node_dict_to_ontology(node_dict)
 
 
 @pytest.fixture
@@ -57,7 +59,6 @@ def entity_extractor_config(sample_pdf_path: Path, entity_ontology: type[BaseMod
         file_path=sample_pdf_path,
         ontology=entity_ontology,
         llm_model_name=LLMOptions.OPENAI_O3_MINI,
-        pdf_loader_kwargs={"mode": "single"},
     )
 
 
